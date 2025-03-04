@@ -3,6 +3,4 @@
 
 #include "library/base.h"
 
-#define Print BasePrint
-
 #endif

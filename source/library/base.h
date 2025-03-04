@@ -42,5 +42,8 @@ typedef s64 sptr;
 typedef u64 uptr;
 
 BASE_API uptr BasePrint(char *Format, ...);
-BASE_API uptr BaseWriteConsole(char *String);
+BASE_API uptr BaseWriteConsole(void *Buffer, uptr BufferSize);
+
+#define Print BasePrint
+
 #endif

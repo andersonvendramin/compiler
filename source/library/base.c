@@ -233,7 +233,7 @@ static void *VAGetArgument(va_args *Argument)
     return Result;
 }
 
-BASE_API uptr BaseWriteConsole(char *String)
+BASE_API uptr BaseWriteConsole(void *Buffer, uptr BufferSize)
 {
     uptr Result = 0;
     
@@ -245,17 +245,16 @@ BASE_API uptr BaseWriteConsole(char *String)
         return Result;
     }
 
-    uptr Length = StringLength(String);
     DWORD CharactersWritten = 0;
-    WriteConsoleA(OutputConsoleHandle, String, (DWORD)Length, &CharactersWritten, 0);
+    WriteConsoleA(OutputConsoleHandle, Buffer, (DWORD)BufferSize, &CharactersWritten, 0);
 
-    if(CharactersWritten != Length)
+    if(CharactersWritten != BufferSize)
     {
-        Log("Characters written %u is different from length %llu of string %s\n", CharactersWritten, Length, String);
+        Log("Characters written %u is different from buffer size %llu\n", CharactersWritten, BufferSize);
         return Result;
     }
 
-    Result = Length;
+    Result = BufferSize;
     return Result;
 }
 
@@ -363,7 +362,7 @@ BASE_API uptr BasePrint(char *Format, ...)
 
     Argument = VAEnd();
 
-    BaseWriteConsole(Buffer);
+    BaseWriteConsole(Buffer, StringLength(Buffer));
 
     return Result;
 }
