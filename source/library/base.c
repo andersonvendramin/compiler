@@ -8,9 +8,23 @@
 
 #define POINTER_SIZE sizeof(void *)
 #define VAGet(argument, type) *(type *)VAGetArgument(argument)
-#define Log(format, ...)
+#define Log Print
 
 typedef u8* va_args;
+
+static bool IsDigit(int Character)
+{
+    bool Result = 0;
+
+    char c = (char)Character;
+
+    if((c >= '0') && (c <= '9'))
+    {
+        Result = 1;
+    }
+
+    return Result;
+}
 
 static uptr StringLength(char *String)
 {
@@ -40,7 +54,7 @@ static uptr CopyCharacter(char *Buffer, uptr BufferSize, int Character)
     return 1;
 }
 
-static uptr CopyString(char *Buffer, uptr BufferSize, char *String, uptr Length)
+static uptr CopyString(char *Buffer, uptr BufferSize, char *String, uptr Length, uptr Precision)
 {
     uptr Result = 0;
 
@@ -48,11 +62,21 @@ static uptr CopyString(char *Buffer, uptr BufferSize, char *String, uptr Length)
 
     if(Length > MaxLength)
     {
-        Log("String %s has length %llu greater than max length %llu\n", String, Length, MaxLength);
+        Log("String %s has length of %llu greater than max length of %llu\n", String, Length, MaxLength);
         return Result;
     }
 
-    for(uptr Index = 0; Index < Length; Index++)
+    if(!Precision)
+    {
+        Precision = Length;
+    }
+    else if(Precision > MaxLength)
+    {
+        Log("String %s has precision length of %llu greater than max length of %llu\n", String, Precision, MaxLength);
+        return Result;
+    }
+
+    for(uptr Index = 0; Index < Precision; Index++)
     {
         Result += CopyCharacter(Buffer + Index, BufferSize - Index, String[Index]);
     }
@@ -94,7 +118,7 @@ static uptr CopySignedInteger32(char *Buffer, uptr BufferSize, s32 Value, int Ba
         WorkBufferIndex++;
     }
 
-    Result = CopyString(Buffer, BufferSize, WorkBuffer + WorkBufferIndex, StringLength(WorkBuffer + WorkBufferIndex));
+    Result = CopyString(Buffer, BufferSize, WorkBuffer + WorkBufferIndex, StringLength(WorkBuffer + WorkBufferIndex), 0);
     return Result;
 }
 
@@ -118,7 +142,7 @@ static uptr CopyUnsignedInteger32(char *Buffer, uptr BufferSize, u32 Value, int 
     
     WorkBufferIndex++;
 
-    Result = CopyString(Buffer, BufferSize, WorkBuffer + WorkBufferIndex, StringLength(WorkBuffer + WorkBufferIndex));
+    Result = CopyString(Buffer, BufferSize, WorkBuffer + WorkBufferIndex, StringLength(WorkBuffer + WorkBufferIndex), 0);
     return Result;
 }
 
@@ -156,7 +180,7 @@ static uptr CopySignedInteger64(char *Buffer, uptr BufferSize, s64 Value, int Ba
         WorkBufferIndex++;
     }
 
-    Result = CopyString(Buffer, BufferSize, WorkBuffer + WorkBufferIndex, StringLength(WorkBuffer + WorkBufferIndex));
+    Result = CopyString(Buffer, BufferSize, WorkBuffer + WorkBufferIndex, StringLength(WorkBuffer + WorkBufferIndex), 0);
     return Result;
 }
 
@@ -180,7 +204,7 @@ static uptr CopyUnsignedInteger64(char *Buffer, uptr BufferSize, u64 Value, int 
     
     WorkBufferIndex++;
 
-    Result = CopyString(Buffer, BufferSize, WorkBuffer + WorkBufferIndex, StringLength(WorkBuffer + WorkBufferIndex));
+    Result = CopyString(Buffer, BufferSize, WorkBuffer + WorkBufferIndex, StringLength(WorkBuffer + WorkBufferIndex), 0);
     return Result;
 }
 
@@ -272,14 +296,26 @@ BASE_API uptr BasePrint(char *Format, ...)
 
     for(char *c = Format; *c != '\0';)
     {
-        if(*c != '%')
+        if((*c != '%') && (*c != '.'))
         {
             Result += CopyCharacter(Buffer + Result, BufferSize - Result, *c);
             c++;
             continue;
         }
 
-        if(*++c == '%')
+        int Precision = 0;
+
+        if(*++c == '.')
+        {
+            c++;
+            while(IsDigit(*c))
+            {
+                Precision = (Precision * 10) + (*c - '0');
+                c++;
+            }
+        }
+
+        if(*c == '%')
         {
             Result += CopyCharacter(Buffer + Result, BufferSize - Result, *c);
             c++;
@@ -328,8 +364,8 @@ BASE_API uptr BasePrint(char *Format, ...)
         }
         else if(*c == 's')
         {
-            char *Value = VAGet(&Argument, char *);
-            Result += CopyString(Buffer + Result, BufferSize - Result, Value, StringLength(Value));
+            char *Value = VAGet(&Argument, char *);            
+            Result += CopyString(Buffer + Result, BufferSize - Result, Value, StringLength(Value), Precision);
             c++;
         }
         else if(*c == 'u')
@@ -355,7 +391,7 @@ BASE_API uptr BasePrint(char *Format, ...)
         }
         else
         {
-            Log("Invalid format specifier: %c\n");
+            Log("Invalid format specifier: %c\n", *--c);
             break;
         }
     }

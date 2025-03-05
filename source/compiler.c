@@ -1,5 +1,17 @@
 #include "compiler.h"
 
+static uptr StringLength(char *String)
+{
+    uptr Result = 0;
+
+    while(*String++ != '\0')
+    {
+        Result++;
+    }
+
+    return Result;
+}
+
 static int PrintUsage()
 {
     Print("Usage: compiler.exe source_file.txt\n");
@@ -76,6 +88,8 @@ int main(int ArgumentCount, char **Argument)
     {
         return Result;
     }
+
+    Print("%.51s\n", "Hello, world!");
 
     ReadSourceCode(Argument[1], StringLength(Argument[1]));
     LexicalAnalysis();
