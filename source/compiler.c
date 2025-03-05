@@ -1,17 +1,5 @@
 #include "compiler.h"
 
-static uptr StringLength(char *String)
-{
-    uptr Result = 0;
-
-    while(*String++ != '\0')
-    {
-        Result++;
-    }
-
-    return Result;
-}
-
 static int PrintUsage()
 {
     Print("Usage: compiler.exe source_file.txt\n");
@@ -36,9 +24,9 @@ static bool FinalizeCompiler()
     return 1;
 }
 
-static void ReadSourceCode(void *Buffer, uptr BufferSize)
+static void ReadSourceCode(compiler *Compiler, void *Buffer, uptr BufferSize)
 {
-
+    
 }
 
 static void LexicalAnalysis()
@@ -89,9 +77,8 @@ int main(int ArgumentCount, char **Argument)
         return Result;
     }
 
-    Print("%.51s\n", "Hello, world!");
-
-    ReadSourceCode(Argument[1], StringLength(Argument[1]));
+    compiler Compiler = {0};
+    ReadSourceCode(&Compiler, Argument[1], StringLength(Argument[1]));
     LexicalAnalysis();
     SyntaxAnalysis();
     bool IsSemanticsValid = SemanticAnalysis();

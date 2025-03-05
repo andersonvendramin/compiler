@@ -45,5 +45,5 @@ BASE_API uptr BasePrint(char *Format, ...);
 BASE_API uptr BaseWriteConsole(void *Buffer, uptr BufferSize);
 
 #define Print BasePrint
-
+#define Log Print
 #endif
