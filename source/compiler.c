@@ -1,5 +1,11 @@
 #include "compiler.h"
 
+static int PrintUsage()
+{
+    Print("Usage: compiler.exe source_file.txt\n");
+    return 0;
+}
+
 static void ReportCompilerErrors()
 {
 }
@@ -19,7 +25,8 @@ static bool FinalizeCompiler()
 }
 
 static void ReadSourceCode(void *Buffer, uptr BufferSize)
-{   
+{
+
 }
 
 static void LexicalAnalysis()
@@ -60,12 +67,17 @@ int main(int ArgumentCount, char **Argument)
 {
     int Result = 1;
 
+    if(ArgumentCount != 2)
+    {
+        return PrintUsage();
+    }
+
     if(!InitializeCompiler())
     {
         return Result;
     }
 
-    ReadSourceCode(0, 0);
+    ReadSourceCode(Argument[1], StringLength(Argument[1]));
     LexicalAnalysis();
     SyntaxAnalysis();
     bool IsSemanticsValid = SemanticAnalysis();
