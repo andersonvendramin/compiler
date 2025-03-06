@@ -26,7 +26,8 @@ static bool FinalizeCompiler()
 
 static void ReadSourceCode(compiler *Compiler, void *Buffer, uptr BufferSize)
 {
-    
+    StringCopyString(Compiler->Source, sizeof(Compiler->Source), Buffer, BufferSize, BufferSize);
+    Compiler->Source[BufferSize] = '\0';
 }
 
 static void LexicalAnalysis()
