@@ -24,10 +24,34 @@ static bool FinalizeCompiler()
     return 1;
 }
 
-static void ReadSourceCode(compiler *Compiler, void *Buffer, uptr BufferSize)
+static bool ReadSourceCode(char *FileName, char *SourceName, uptr SourceNameSize, void *Source)
 {
-    StringCopyString(Compiler->Source, sizeof(Compiler->Source), Buffer, BufferSize, BufferSize);
-    Compiler->Source[BufferSize] = '\0';
+    bool Result = 0;
+
+    uptr FileSize = 0;
+
+    if(!PlatformGetFileSize(FileName, &FileSize))
+    {
+        return Result;
+    }
+
+    if(FileSize > MAX_U32)
+    {
+        Log("File size is greater than %u\n", MAX_U32);
+        return Result;
+    }
+
+    if(!PlatformReadFile(FileName, Source, (u32)FileSize))
+    {
+        return Result;
+    }
+
+    u8 *buffer = Source;
+    buffer[FileSize] = '\0';
+
+    StringCopyString(SourceName, SourceNameSize, FileName, StringLength(FileName), 0);
+
+    return 1;
 }
 
 static void LexicalAnalysis()
@@ -79,7 +103,12 @@ int main(int ArgumentCount, char **Argument)
     }
 
     compiler Compiler = {0};
-    ReadSourceCode(&Compiler, Argument[1], StringLength(Argument[1]));
+
+    if(!ReadSourceCode(Argument[1], Compiler.SourceName, sizeof(Compiler.SourceName), Compiler.Source))
+    {
+        return Result;
+    }
+
     LexicalAnalysis();
     SyntaxAnalysis();
     bool IsSemanticsValid = SemanticAnalysis();

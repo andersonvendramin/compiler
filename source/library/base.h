@@ -19,6 +19,8 @@
     #define Assert(expression)
 #endif
 
+#define MAX_U32 0xFFFFFFFF
+
 #define ArrayCount(array) (sizeof(array) / sizeof((array)[0]))
 #define Kilobytes(value) ((value) * 1024LL)
 #define Megabytes(value) (Kilobytes(value) * 1024LL)
