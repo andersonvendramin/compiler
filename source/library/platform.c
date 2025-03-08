@@ -155,3 +155,39 @@ PLATFORM_API bool PlatformWriteFile(char *FileName, void *Buffer, u32 BufferSize
 
     return 1;
 }
+
+PLATFORM_API bool PlatformReallocateMemory(void **Memory, uptr NewSize, uptr OldSize)
+{
+    bool Result = 0;
+
+    if(NewSize < OldSize)
+    {
+        Log("New size %llu is less than old size %llu\n", NewSize, OldSize);
+        return Result;
+    }
+
+    void *ReallocatedMemory = 0;
+    
+    if(!PlatformAllocateMemory(&ReallocatedMemory, NewSize))
+    {
+        return Result;
+    }
+
+    u8 *destination = ReallocatedMemory;
+    u8 *source = *Memory;
+
+    for(uptr Index = 0; Index < OldSize; Index++)
+    {
+        *destination++ = *source++;
+    }
+
+    if(!PlatformFreeMemory(Memory))
+    {
+        PlatformFreeMemory(&ReallocatedMemory);
+        return Result;
+    }
+
+    *Memory = ReallocatedMemory;
+
+    return 1;
+}

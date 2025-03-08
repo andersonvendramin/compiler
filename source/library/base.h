@@ -43,8 +43,8 @@ typedef uint bool;
 typedef s64 sptr;
 typedef u64 uptr;
 
-BASE_API uptr BasePrint(char *Format, ...);
 BASE_API uptr BaseWriteConsole(void *Buffer, uptr BufferSize);
+BASE_API uptr BasePrint(char *Format, ...);
 
 #define Print BasePrint
 #define Log Print

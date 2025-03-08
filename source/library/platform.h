@@ -18,5 +18,6 @@ PLATFORM_API bool PlatformFreeMemory(void **Memory);
 PLATFORM_API bool PlatformGetFileSize(char *FileName, uptr *Size);
 PLATFORM_API bool PlatformReadFile(char *FileName, void *Buffer, u32 BufferSize);
 PLATFORM_API bool PlatformWriteFile(char *FileName, void *Buffer, u32 BufferSize);
+PLATFORM_API bool PlatformReallocateMemory(void **Memory, uptr NewSize, uptr OldSize);
 
 #endif

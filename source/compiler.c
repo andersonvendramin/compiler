@@ -1,3 +1,7 @@
+// @TODO: Fix char '.' when calling Print 
+// @TODO: Fix '.' on CopyFloat64()
+//@TODO: Unity test compiler
+
 #include "compiler.h"
 
 static int PrintUsage()
@@ -46,16 +50,18 @@ static bool ReadSourceCode(char *FileName, char *SourceName, uptr SourceNameSize
         return Result;
     }
 
-    u8 *buffer = Source;
-    buffer[FileSize] = '\0';
+    u8 *Buffer = Source;
+    Buffer[FileSize] = '\0';
+    uptr FileNameLength = StringLength(FileName);
 
-    StringCopyString(SourceName, SourceNameSize, FileName, StringLength(FileName), 0);
+    if(StringCopyString(SourceName, SourceNameSize, FileName, FileNameLength, 0) != FileNameLength)
+    {
+        *SourceName = '\0';
+        *Buffer = '\0';
+        return Result;
+    }
 
     return 1;
-}
-
-static void LexicalAnalysis()
-{
 }
 
 static void SyntaxAnalysis()
@@ -109,8 +115,38 @@ int main(int ArgumentCount, char **Argument)
         return Result;
     }
 
-    LexicalAnalysis();
+    uptr TokenCount = 0;
+    token *Token = LexicalAnalysis(&Compiler, &TokenCount);
+    char *TokenString[] = 
+    {
+        "TOKEN_NUMBER",
+        "TOKEN_IDENTIFIER",
+        "TOKEN_PLUS",
+        "TOKEN_MINUS",
+        "TOKEN_STAR",
+        "TOKEN_SLASH",
+        "TOKEN_LEFT_PARENTHESES",
+        "TOKEN_RIGHT_PARENTHESES",
+    };    
+
+    for(uptr Index = 0; Index < TokenCount; Index++)
+    {
+        Print("Token_Type = %s\n", TokenString[Token[Index].Type]);
+
+        if(Token[Index].Type == TOKEN_NUMBER)
+        {
+            Print("Token_Value = %.1f\n", Token[Index].Value);
+        }
+        else if(Token[Index].Type == TOKEN_IDENTIFIER)
+        {
+            Print("Token_Identifier = %s\n", Token[Index].Identifier);
+        }
+
+        Print("\n");
+    }
+
     SyntaxAnalysis();
+    
     bool IsSemanticsValid = SemanticAnalysis();
 
     if(IsSemanticsValid)

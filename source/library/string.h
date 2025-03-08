@@ -22,5 +22,7 @@ STRING_API uptr StringCopyUnsignedInteger32(char *Buffer, uptr BufferSize, u32 V
 STRING_API uptr StringCopySignedInteger64(char *Buffer, uptr BufferSize, s64 Value, int Base, char *Representation);
 STRING_API uptr StringCopyUnsignedInteger64(char *Buffer, uptr BufferSize, u64 Value, int Base, char *Representation);
 STRING_API uptr StringCopyFloat64(char *Buffer, uptr BufferSize, f64 Value, int Precision);
+STRING_API bool StringIsSpace(int Character);
+STRING_API bool StringIsLetter(int Character);
 
 #endif

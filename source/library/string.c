@@ -223,3 +223,31 @@ STRING_API uptr StringCopyFloat64(char *Buffer, uptr BufferSize, f64 Value, int 
 
     return Result;
 }
+
+STRING_API bool StringIsSpace(int Character)
+{
+    bool Result = 0;
+
+    char c = (char)Character;
+
+    if((c == ' ') || (c == '\f') || (c == '\n') || (c == '\r') || (c == '\t') || (c == '\v'))
+    {
+        Result = 1;
+    }
+
+    return Result;
+}
+
+STRING_API bool StringIsLetter(int Character)
+{
+    bool Result = 0;
+
+    char c = (char)Character;
+
+    if(((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z')))
+    {
+        Result = 1;
+    }
+
+    return Result;
+}
