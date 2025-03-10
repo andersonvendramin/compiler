@@ -1,5 +1,5 @@
-#ifndef LEXER_H
-#define LEXER_H
+#ifndef LEXICAL_ANALYSIS_H
+#define LEXICAL_ANALYSIS_H
 
 #include "library/base.h"
 #include "library/platform.h"

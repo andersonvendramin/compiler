@@ -12,6 +12,6 @@ typedef struct
     uptr SourceIndex;
 } compiler;
 
-#include "lexer.c"
+#include "lexical_analysis.c"
 
 #endif
