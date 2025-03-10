@@ -6,6 +6,7 @@
 
 typedef enum
 {
+    TOKEN_INVALID,
     TOKEN_NUMBER,
     TOKEN_IDENTIFIER,
     TOKEN_PLUS,

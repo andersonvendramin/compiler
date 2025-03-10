@@ -116,9 +116,10 @@ int main(int ArgumentCount, char **Argument)
     }
 
     uptr TokenCount = 0;
-    token *Token = LexicalAnalysis(&Compiler, &TokenCount);
+    Compiler.Token = LexicalAnalysis(&Compiler, &Compiler.TokenCount);
     char *TokenString[] = 
     {
+        "TOKEN_INVALID",
         "TOKEN_NUMBER",
         "TOKEN_IDENTIFIER",
         "TOKEN_PLUS",
@@ -129,22 +130,28 @@ int main(int ArgumentCount, char **Argument)
         "TOKEN_RIGHT_PARENTHESES",
     };    
 
-    for(uptr Index = 0; Index < TokenCount; Index++)
+    for(uptr Index = 0; Index < Compiler.TokenCount; Index++)
     {
-        Print("Token_Type = %s\n", TokenString[Token[Index].Type]);
+        token *Token = &Compiler.Token[Index];
+        Print("Token_Type = %s\n", TokenString[Token->Type]);
 
-        if(Token[Index].Type == TOKEN_NUMBER)
+        if(Token->Type == TOKEN_NUMBER)
         {
-            Print("Token_Value = %.1f\n", Token[Index].Value);
+            Print("Token_Value = %.1f\n", Token->Value);
         }
-        else if(Token[Index].Type == TOKEN_IDENTIFIER)
+        else if(Token->Type == TOKEN_IDENTIFIER)
         {
-            Print("Token_Identifier = %s\n", Token[Index].Identifier);
+            Print("Token_Identifier = %s\n", Token->Identifier);
         }
 
         Print("\n");
     }
 
+    ast *AST = Expression(&Compiler);
+
+    Print("= %f\n", EvaluateAST(AST));
+
+#if 0
     SyntaxAnalysis();
     
     bool IsSemanticsValid = SemanticAnalysis();
@@ -165,7 +172,7 @@ int main(int ArgumentCount, char **Argument)
         ReportCompilerErrors();
         return Result;
     }
-
+#endif
     
     return 0;
 }
