@@ -148,7 +148,6 @@ int main(int ArgumentCount, char **Argument)
     }
 
     ast *AST = Expression(&Compiler);
-
     Print("= %f\n", EvaluateAST(AST));
 
 #if 0

@@ -1,9 +1,16 @@
 #include "syntax_analysis.h"
+
 static ast *Expression(compiler *Compiler);
 
 f64 EvaluateAST(ast *Node)
 {
     f64 Result = 0.0;
+
+    if(!Node)
+    {
+        Log("Invalid AST, the result will be invalid\n");
+        return Result;
+    }
 
     switch(Node->Type)
     {
@@ -102,15 +109,22 @@ static bool AdvanceToken(compiler *Compiler)
 {
     bool Result = 0;
 
-    if(Compiler->TokenIndex < Compiler->TokenCount)
+    if(Compiler->TokenIndex < (Compiler->TokenCount - 1))
     {
         Compiler->TokenIndex++;
         Result = 1;
     }
-    else
+
+    return Result;
+}
+
+static token *GetToken(compiler *Compiler)
+{
+    token *Result = 0;
+
+    if(Compiler->TokenIndex < Compiler->TokenCount)
     {
-        Log("TokenIndex >= TokenCount\n");
-        return Result;
+        Result = &Compiler->Token[Compiler->TokenIndex];
     }
 
     return Result;
@@ -120,19 +134,23 @@ static ast *Factor(compiler *Compiler)
 {
     ast *Result = 0;
 
-    if(TokenToASTType(Compiler->Token[Compiler->TokenIndex].Type) == AST_NUMBER)
+    if(TokenToASTType(GetToken(Compiler)->Type) == AST_NUMBER)
     {
-        Result = CreateAST(AST_NUMBER, Compiler->Token[Compiler->TokenIndex].Value, 0, 0);
+        Result = CreateAST(AST_NUMBER, GetToken(Compiler)->Value, 0, 0);
     }
-    else if(Compiler->Token[Compiler->TokenIndex].Type == TOKEN_LEFT_PARENTHESES)
+    else if(GetToken(Compiler)->Type == TOKEN_LEFT_PARENTHESES)
     {
         AdvanceToken(Compiler);
         Result = Expression(Compiler);
         
+        if(GetToken(Compiler)->Type != TOKEN_RIGHT_PARENTHESES)
+        {
+            return 0;
+        }
     }
     else
     {
-        Log("Invalid syntax: ast type %d\n", TokenToASTType(Compiler->Token[Compiler->TokenIndex].Type));
+        Log("Invalid syntax: ast type %d\n", TokenToASTType(GetToken(Compiler)->Type));
         return Result;
     }
 
@@ -145,11 +163,9 @@ static ast *Term(compiler *Compiler)
 {
     ast *Result = Factor(Compiler);
     
-    token *Token = &Compiler->Token[Compiler->TokenIndex];
-    
-    while((TokenToASTType(Compiler->Token[Compiler->TokenIndex].Type) == AST_MULTIPLY) || (TokenToASTType(Compiler->Token[Compiler->TokenIndex].Type) == AST_DIVIDE))
+    while((TokenToASTType(GetToken(Compiler)->Type) == AST_MULTIPLY) || (TokenToASTType(GetToken(Compiler)->Type) == AST_DIVIDE))
     {
-        ast_type ASTType = TokenToASTType(Compiler->Token[Compiler->TokenIndex].Type);
+        ast_type ASTType = TokenToASTType(GetToken(Compiler)->Type);
         AdvanceToken(Compiler);
         ast *Right = Factor(Compiler);
 
@@ -163,9 +179,9 @@ static ast *Expression(compiler *Compiler)
 {
     ast *Result = Term(Compiler);
     
-    while((TokenToASTType(Compiler->Token[Compiler->TokenIndex].Type) == AST_ADD) || (TokenToASTType(Compiler->Token[Compiler->TokenIndex].Type) == AST_SUBTRACT))
+    while((TokenToASTType(GetToken(Compiler)->Type) == AST_ADD) || (TokenToASTType(GetToken(Compiler)->Type) == AST_SUBTRACT))
     {
-        ast_type ASTType = TokenToASTType(Compiler->Token[Compiler->TokenIndex].Type);
+        ast_type ASTType = TokenToASTType(GetToken(Compiler)->Type);
         AdvanceToken(Compiler);
         ast *Right = Term(Compiler);
 

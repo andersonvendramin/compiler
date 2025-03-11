@@ -14,6 +14,12 @@ static token *LexicalAnalysis(compiler *Compiler, uptr *TokenCount)
 
     for(char *c = Compiler->Source; *c != '\0';)
     {
+        if(StringIsSpace(*c))
+        {
+            c++;
+            continue;
+        }
+
         if(*TokenCount >= Capacity)
         {
             Capacity *= 2;
@@ -22,16 +28,6 @@ static token *LexicalAnalysis(compiler *Compiler, uptr *TokenCount)
             {
                 return Result;
             }
-        }
-
-        while(StringIsSpace(*c))
-        {
-            c++;
-        }
-
-        if(*c == '\0')
-        {
-            break;
         }
 
         if(StringIsDigit(*c))
